@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Corbeille{% endblock %}
+
+{% block extra_css %}
+<style>
+  .gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    padding: 30px;
+  }
+
+  .card {
+    background-color: #1e1e1e;
+    border-radius: 16px;
+    padding: 10px;
+    position: relative;
+    width: 280px;
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .card img {
+    max-width: 100%;
+    border-radius: 12px;
+    margin-bottom: 10px;
+  }
+
+  .card p.description {
+    margin: 0 0 10px 0;
+    font-size: 14px;
+    color: #ccc;
+    text-align: center;
+    max-height: 3em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .days-remaining {
+    font-size: 13px;
+    color: #a5d6a7;
+    margin: 5px 0 10px 0;
+    text-align: center;
+  }
+
+  .restore-button {
+    background-color: #2e7d32;
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+  }
+
+  .restore-button:hover {
+    background-color: #388e3c;
+  }
+
+  .empty-message {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #888;
+    margin-top: 50px;
+    width: 100%;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+  <div class="gallery">
+    {% if deleted_images %}
+      {% for image in deleted_images %}
+        <div class="card">
+          <img src="{{ image.image.url }}" alt="Image supprimée: {{ image.description|default:'Sans description' }}">
+          <p class="description">{{ image.description }}</p>
+          <p class="days-remaining">
+            {% if image.days_until_permanent_delete %}
+              Jours restants : {{ image.days_until_permanent_delete }}
+            {% else %}
+              Date de suppression inconnue
+            {% endif %}
+          </p>
+          <form method="post" action="{% url 'restore_image' image.id %}">
+            {% csrf_token %}
+            <button type="submit" class="restore-button">Restaurer</button>
+          </form>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="empty-message">Aucune image dans la corbeille.</p>
+    {% endif %}
+  </div>
+{% endblock %}

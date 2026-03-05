@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Supprimer l'image</title>
+</head>
+<body>
+    <h1>Supprimer l'image</h1>
+    <p>Voulez-vous vraiment supprimer cette image ?</p>
+    <img src="{{ image.image.url }}" alt="Image" width="300">
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Oui, supprimer</button>
+        <a href="{% url 'my_gallery' %}">Annuler</a>
+    </form>
+</body>
+</html>

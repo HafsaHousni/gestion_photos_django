@@ -1,0 +1,191 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Inscription</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      color: white;
+      overflow: hidden;
+      background: url("{% static 'galerie/photos/pic4.jpg' %}") no-repeat center center fixed;
+      background-size: cover;
+      position: relative;
+    }
+
+    #overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: -1;
+    }
+
+    .register-container {
+      background-color: rgba(0,0,0,0.6);
+      padding: 30px 60px;
+      border-radius: 30px;
+      width: 600px;
+      max-width: 90vw;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-around;
+      position: relative;
+      z-index: 1;
+      margin: auto;
+      top: 50%;
+      transform: translateY(-50%);
+      box-sizing: border-box;
+      gap: 40px;
+    }
+
+    .register-info {
+      max-width: 45%;
+    }
+
+    .register-info h2 {
+      font-size: 2.8rem;
+      margin: 0;
+    }
+
+    form {
+      width: 50%;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    input[type="text"], input[type="email"], input[type="password"] {
+      width: 100%;
+      padding: 15px 20px;
+      border-radius: 30px;
+      border: 2px solid white;
+      background: transparent;
+      color: white;
+      font-size: 1.1rem;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.3s;
+    }
+
+    input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus {
+      border-color: white;
+    }
+
+    button {
+      padding: 15px 0;
+      border-radius: 30px;
+      border: 2px solid white;
+      background-color: rgba(255, 255, 255, 0.2);
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    button:hover {
+      background-color: white;
+      color: black;
+    }
+
+    .login-link {
+      margin-top: 10px;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      border-bottom: 2px solid white;
+      padding-bottom: 3px;
+      display: inline-block;
+      text-align: center;
+    }
+
+    .login-link:hover {
+      color: black;
+      border-color: black;
+    }
+
+    .error-message {
+      color: #ffaaaa;
+      font-size: 0.9rem;
+      margin-top: -15px;
+      margin-bottom: -5px;
+    }
+
+    @media (max-width: 700px) {
+      .register-container {
+        flex-direction: column;
+        width: 90vw;
+        padding: 30px 20px;
+      }
+
+      .register-info, form {
+        width: 100%;
+      }
+
+      .register-info {
+        margin-bottom: 30px;
+        text-align: center;
+      }
+
+      .login-link {
+        text-align: center;
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="overlay"></div>
+
+  <div class="register-container">
+    <div class="register-info">
+      <h2>Inscription</h2>
+    </div>
+
+    <form method="post" action="{% url 'register' %}">
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <p class="error-message">{{ form.non_field_errors.0 }}</p>
+      {% endif %}
+
+      <div>
+        {% if form.username.errors %}
+          <p class="error-message">{{ form.username.errors.0 }}</p>
+        {% endif %}
+        <input type="text" name="username" placeholder="Nom d'utilisateur" value="{{ form.username.value }}" required />
+      </div>
+
+      <div>
+        {% if form.email.errors %}
+          <p class="error-message">{{ form.email.errors.0 }}</p>
+        {% endif %}
+        <input type="email" name="email" placeholder="Adresse e-mail" value="{{ form.email.value }}" required />
+      </div>
+
+      <div>
+        {% if form.password1.errors %}
+          <p class="error-message">{{ form.password1.errors.0 }}</p>
+        {% endif %}
+        <input type="password" name="password1" placeholder="Mot de passe" required />
+      </div>
+
+      <div>
+        {% if form.password2.errors %}
+          <p class="error-message">{{ form.password2.errors.0 }}</p>
+        {% endif %}
+        <input type="password" name="password2" placeholder="Confirmer mot de passe" required />
+      </div>
+
+      <button type="submit">S'inscrire</button>
+      <a href="{% url 'login' %}" class="login-link">Déjà un compte ? Connectez-vous</a>
+    </form>
+  </div>
+</body>
+</html>

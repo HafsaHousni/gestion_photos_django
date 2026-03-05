@@ -1,0 +1,153 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Connexion</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      color: white;
+      overflow: hidden;
+      background: url("{% static 'galerie/photos/pic2.jpg' %}") no-repeat center center fixed;
+      background-size: cover;
+      position: relative;
+      z-index: -1;
+    }
+
+    #overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 0;
+    }
+
+    .login-container {
+      background-color: rgba(0,0,0,0.6);
+      padding: 30px 60px;
+      border-radius: 30px;
+      width: 600px;
+      max-width: 90vw;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-around;
+      position: relative;
+      z-index: 1;
+      margin: auto;
+      top: 50%;
+      transform: translateY(-50%);
+      box-sizing: border-box;
+      gap: 40px;
+    }
+
+    .login-info {
+      max-width: 45%;
+    }
+
+    .login-info h2 {
+      font-size: 2.8rem;
+      margin: 0;
+    }
+
+    form {
+      width: 50%;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 15px 20px;
+      border-radius: 30px;
+      border: 2px solid white;
+      background: transparent;
+      color: white;
+      font-size: 1.1rem;
+      outline: none;
+      box-sizing: border-box;
+      transition: border-color 0.3s;
+    }
+
+    input[type="text"]:focus, input[type="password"]:focus {
+      border-color: white;
+    }
+
+    button {
+      padding: 15px 0;
+      border-radius: 30px;
+      border: 2px solid white;
+      background-color: rgba(255, 255, 255, 0.2);
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    button:hover {
+      background-color: white;
+      color: black;
+    }
+
+    .register-link {
+      margin-top: 15px;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      border-bottom: 2px solid white;
+      padding-bottom: 3px;
+      display: inline-block;
+      transition: color 0.3s, border-color 0.3s;
+      text-align: center;
+    }
+
+    .register-link:hover {
+      color: black;
+      border-color: black;
+    }
+
+    @media (max-width: 700px) {
+      .login-container {
+        flex-direction: column;
+        width: 90vw;
+        padding: 30px 20px;
+      }
+      .login-info, form {
+        width: 100%;
+      }
+      .login-info {
+        margin-bottom: 30px;
+        text-align: center;
+      }
+      .register-link {
+        text-align: center;
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="overlay"></div>
+
+  <div class="login-container">
+    <div class="login-info">
+      <h2>Connexion</h2>
+    </div>
+    <form method="post" action="{% url 'login' %}">
+      {% csrf_token %}
+      <input type="text" name="username" placeholder="Nom d'utilisateur" required autofocus />
+      <input type="password" name="password" placeholder="Mot de passe" required />
+      <button type="submit">Se connecter</button>
+      <a href="{% url 'register' %}" class="register-link">Pas encore inscrit ? Créez un compte</a>
+    </form>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+  form {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 40px 35px;
+    background: linear-gradient(145deg, #1b1b1b, #0f0f0f);
+    border-radius: 18px;
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.05);
+    color: #f0f0f0;
+    font-family: 'Inter', sans-serif;
+  }
+
+  form h1 {
+    text-align: center;
+    font-size: 30px;
+    margin-bottom: 35px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  .messages {
+    margin-bottom: 25px;
+    padding: 16px 20px;
+    border-left: 4px solid #ff5b5b;
+    background-color: #2d2d2d;
+    border-radius: 8px;
+  }
+
+  .messages p {
+    margin: 0;
+    color: #ff5b5b;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  form label {
+    font-size: 15px;
+    font-weight: 600;
+    color: #ccc;
+    margin-top: 20px;
+    display: block;
+  }
+
+  form input[type="text"],
+  form input[type="password"] {
+    width: 100%;
+    padding: 14px 16px;
+    margin-top: 6px;
+    border-radius: 12px;
+    border: 1px solid #333;
+    background-color: #181818;
+    color: #eee;
+    font-size: 14px;
+    transition: border-color 0.3s, background-color 0.3s;
+  }
+
+  form input[type="text"]:focus,
+  form input[type="password"]:focus {
+    border-color: #777;
+    background-color: #222;
+    outline: none;
+  }
+
+  form button {
+    margin-top: 30px;
+    width: 100%;
+    padding: 15px 0;
+    background-color: #fff;
+    color: #000;
+    font-weight: 700;
+    font-size: 16px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  form button:hover {
+    background-color: #e2e2e2;
+  }
+</style>
+
+<div class="container">
+  <h1>Mon Profil</h1>
+
+  {% if messages %}
+    <div class="messages">
+      {% for message in messages %}
+        <p>{{ message }}</p>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <form method="post">
+    {% csrf_token %}
+
+    <label for="username">Nom d'utilisateur</label>
+    <input type="text" name="username" value="{{ user.username }}" required>
+
+    <label for="old_password">Ancien mot de passe</label>
+    <input type="password" name="old_password" required>
+
+    <label for="new_password1">Nouveau mot de passe</label>
+    <input type="password" name="new_password1" required>
+
+    <label for="new_password2">Confirmer le nouveau mot de passe</label>
+    <input type="password" name="new_password2" required>
+
+    <button type="submit">Mettre à jour</button>
+  </form>
+</div>
+{% endblock %}
+

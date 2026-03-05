@@ -1,0 +1,6 @@
+<h2>Ajouter des images à un album</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Ajouter</button>
+</form>

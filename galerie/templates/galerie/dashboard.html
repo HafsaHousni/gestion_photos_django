@@ -1,0 +1,251 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+
+<style>
+  .toggle-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .toggle-button {
+    cursor: pointer;
+    padding: 1rem 2rem;
+    border: 2px solid #2ecc71;
+    border-radius: 8px;
+    user-select: none;
+    font-weight: bold;
+    background-color: #222;
+    color: #2ecc71;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  .toggle-button.active {
+    background-color: #2ecc71;
+    color: #121212;
+  }
+  .image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill,minmax(180px,1fr));
+    gap: 1.5rem 3rem; /* plus d'espace horizontal pour bouton */
+    position: relative;
+  }
+  .image-card {
+    position: relative;
+    background-color: #1e1e1e;
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.7);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .image-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px rgba(46,204,113,0.6);
+  }
+  .image-card img {
+    max-width: 100%;
+    border-radius: 10px;
+    object-fit: cover;
+    margin-bottom: 8px;
+    height: 120px;
+  }
+  .image-card p {
+    color: #ccc;
+    font-size: 0.9rem;
+    text-align: center;
+    margin: 0 0 5px 0;
+    max-height: 3rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Conteneur pour image + bouton à droite */
+  .image-card-wrapper {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+    position: relative;
+  }
+
+  /* Bouton trois points vertical à droite hors de l'image */
+  .menu-button {
+    background: transparent;
+    border: none;
+    color: #2ecc71;
+    font-size: 1.8rem;
+    cursor: pointer;
+    user-select: none;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+    align-self: flex-start;
+    margin-left: 5px;
+    flex-shrink: 0;
+  }
+  .menu-button:hover {
+    background-color: rgba(46,204,113,0.2);
+  }
+
+  /* Menu déroulant */
+  .menu-dropdown {
+    position: absolute;
+    top: 35px;
+    right: -10px; /* positionné à droite hors image */
+    background-color: #222;
+    border: 1px solid #2ecc71;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.8);
+    display: none;
+    flex-direction: column;
+    min-width: 130px;
+    z-index: 100;
+  }
+  .menu-dropdown.show {
+    display: flex;
+  }
+  .menu-dropdown a,
+  .menu-dropdown button {
+    padding: 8px 12px;
+    color: #2ecc71;
+    background: none;
+    border: none;
+    text-align: left;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-decoration: none;
+    width: 100%;
+    user-select: none;
+    border-radius: 4px;
+    transition: background-color 0.25s ease;
+  }
+  .menu-dropdown a:hover,
+  .menu-dropdown button:hover {
+    background-color: #27ae60;
+    color: white;
+  }
+  .menu-dropdown form {
+    margin: 0;
+  }
+</style>
+
+<div class="toggle-buttons">
+  <div id="btnPublic" class="toggle-button active">🌍 Images publiques</div>
+  <div id="btnPrivate" class="toggle-button">📸 Images privées</div>
+</div>
+
+<div id="publicImages" class="image-grid">
+  {% for img in public_images %}
+    <div class="image-card">
+      <div class="image-card-wrapper">
+        <img src="{{ img.image.url }}" alt="Image publique">
+        <!-- Bouton trois points -->
+        <button class="menu-button" aria-label="Options" title="Options">⋮</button>
+      </div>
+      <p>{{ img.description }}</p>
+
+      <!-- Menu déroulant -->
+      <div class="menu-dropdown" role="menu">
+        {% if img.user == request.user %}
+          <a href="{% url 'edit_image' img.id %}" role="menuitem">Modifier</a>
+          <form action="{% url 'delete_image' img.id %}" method="post" onsubmit="return confirm('Voulez-vous vraiment supprimer cette image ?');" role="none">
+            {% csrf_token %}
+            <button type="submit" role="menuitem">Supprimer</button>
+          </form>
+        {% endif %}
+        <a href="{{ img.image.url }}" download role="menuitem">Télécharger</a>
+      </div>
+    </div>
+  {% empty %}
+    <p>Aucune image publique.</p>
+  {% endfor %}
+</div>
+
+<div id="privateImages" class="image-grid" style="display:none;">
+  {% for img in private_images %}
+    <div class="image-card">
+      <div class="image-card-wrapper">
+        <img src="{{ img.image.url }}" alt="Image privée">
+        <!-- Bouton trois points -->
+        <button class="menu-button" aria-label="Options" title="Options">⋮</button>
+      </div>
+      <p>{{ img.description }}</p>
+
+      <!-- Menu déroulant -->
+      <div class="menu-dropdown" role="menu">
+        {% if img.user == request.user %}
+          <a href="{% url 'edit_image' img.id %}" role="menuitem">Modifier</a>
+          <form action="{% url 'delete_image' img.id %}" method="post" onsubmit="return confirm('Voulez-vous vraiment supprimer cette image ?');" role="none">
+            {% csrf_token %}
+            <button type="submit" role="menuitem">Supprimer</button>
+          </form>
+        {% endif %}
+        <a href="{{ img.image.url }}" download role="menuitem">Télécharger</a>
+      </div>
+    </div>
+  {% empty %}
+    <p>Aucune image privée.</p>
+  {% endfor %}
+</div>
+
+<script>
+  const btnPublic = document.getElementById('btnPublic');
+  const btnPrivate = document.getElementById('btnPrivate');
+  const publicImages = document.getElementById('publicImages');
+  const privateImages = document.getElementById('privateImages');
+
+  btnPublic.addEventListener('click', () => {
+    publicImages.style.display = 'grid';
+    privateImages.style.display = 'none';
+    btnPublic.classList.add('active');
+    btnPrivate.classList.remove('active');
+  });
+
+  btnPrivate.addEventListener('click', () => {
+    privateImages.style.display = 'grid';
+    publicImages.style.display = 'none';
+    btnPrivate.classList.add('active');
+    btnPublic.classList.remove('active');
+  });
+
+  // Gestion menu trois points
+  document.querySelectorAll('.image-card').forEach(card => {
+    const btn = card.querySelector('.menu-button');
+    const menu = card.querySelector('.menu-dropdown');
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+
+      // Fermer tous les menus ouverts sauf celui-ci
+      document.querySelectorAll('.menu-dropdown.show').forEach(openMenu => {
+        if (openMenu !== menu) {
+          openMenu.classList.remove('show');
+        }
+      });
+
+      // Toggle menu actuel
+      menu.classList.toggle('show');
+    });
+  });
+
+  // Clic ailleurs ferme tous les menus
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.menu-dropdown.show').forEach(openMenu => {
+      openMenu.classList.remove('show');
+    });
+  });
+
+  // Optionnel : fermer menu avec touche Echap
+  document.addEventListener('keydown', (e) => {
+    if (e.key === "Escape") {
+      document.querySelectorAll('.menu-dropdown.show').forEach(openMenu => {
+        openMenu.classList.remove('show');
+      });
+    }
+  });
+</script>
+
+{% endblock %}

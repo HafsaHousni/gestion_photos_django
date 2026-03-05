@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Mes albums{% endblock %}
+
+{% block content %}
+<h1>Mes albums</h1>
+
+<div class="albums-grid" style="display:grid; grid-template-columns: repeat(auto-fill,minmax(150px,1fr)); gap:1rem;">
+  {% for album in albums %}
+    <a href="{% url 'album_detail' album.id %}" class="album-card" style="border:1px solid #ccc; padding:10px; border-radius:8px; text-align:center; text-decoration:none; color:black;">
+      {% if album.image_set.first %}
+        <img src="{{ album.image_set.first.image.url }}" alt="{{ album.nom }}" style="width:100%; height:150px; object-fit:cover; border-radius:8px;">
+      {% else %}
+        <div style="width:100%; height:150px; background:#ddd; border-radius:8px; display:flex; align-items:center; justify-content:center;">Aucune image</div>
+      {% endif %}
+      <h3>{{ album.nom }}</h3>
+      <p>{{ album.image_set.count }} photos</p>
+    </a>
+  {% empty %}
+    <p>Vous n'avez pas encore d'albums.</p>
+  {% endfor %}
+</div>
+{% endblock %}

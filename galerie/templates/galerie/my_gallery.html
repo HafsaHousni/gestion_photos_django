@@ -1,0 +1,297 @@
+{% extends "base.html" %}
+{% block title %}Ma Galerie{% endblock %}
+
+{% block content %}
+
+<style>
+  :root {
+    --green: #2ecc71;
+    --green-dark: #27ae60;
+    --background-dark: #121212;
+    --card-bg: #1e1e1e;
+    --text-light: #ccc;
+    --text-dark: #222;
+  }
+
+  /* Container toggles */
+  .toggle-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .toggle-button {
+    cursor: pointer;
+    padding: 0.8rem 2rem;
+    border: 2px solid var(--green);
+    border-radius: 8px;
+    user-select: none;
+    font-weight: 600;
+    background-color: var(--background-dark);
+    color: var(--green);
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  .toggle-button.active {
+    background-color: var(--green);
+    color: var(--background-dark);
+  }
+  .toggle-button:focus {
+    outline: 3px solid var(--green);
+    outline-offset: 2px;
+  }
+
+  /* Grille d'images */
+  .image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1.5rem 2rem;
+  }
+
+  /* Carte image */
+  .image-card {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.7);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .image-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px var(--green);
+  }
+  .image-card img {
+    width: 100%;
+    height: 120px;
+    border-radius: 10px;
+    object-fit: cover;
+    margin-bottom: 8px;
+  }
+
+  /* Description avec limitation à 2 lignes */
+  .image-card p {
+    color: var(--text-light);
+    font-size: 0.9rem;
+    text-align: center;
+    margin: 0 0 5px 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Wrapper image + bouton menu */
+  .image-card-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  /* Bouton menu 3 points */
+  .menu-button {
+    background: transparent;
+    border: none;
+    color: var(--green);
+    font-size: 1.6rem;
+    cursor: pointer;
+    user-select: none;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+    flex-shrink: 0;
+  }
+  .menu-button:hover,
+  .menu-button:focus {
+    background-color: rgba(46,204,113,0.2);
+    outline: 3px solid var(--green);
+    outline-offset: 2px;
+  }
+
+  /* Menu déroulant */
+  .menu-dropdown {
+    position: absolute;
+    top: 40px;
+    right: 12px;
+    background-color: var(--background-dark);
+    border: 1px solid var(--green);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.8);
+    display: none;
+    flex-direction: column;
+    min-width: 140px;
+    z-index: 100;
+  }
+  .menu-dropdown.show {
+    display: flex;
+  }
+  .menu-dropdown a,
+  .menu-dropdown button {
+    padding: 8px 14px;
+    color: var(--green);
+    background: none;
+    border: none;
+    text-align: left;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-decoration: none;
+    width: 100%;
+    user-select: none;
+    border-radius: 4px;
+    transition: background-color 0.25s ease;
+  }
+  .menu-dropdown a:hover,
+  .menu-dropdown button:hover {
+    background-color: var(--green-dark);
+    color: white;
+  }
+  .menu-dropdown form {
+    margin: 0;
+  }
+</style>
+
+<div class="toggle-buttons" role="tablist" aria-label="Choisir la galerie">
+  <div id="btnPublic" class="toggle-button active" role="tab" tabindex="0" aria-selected="true" aria-controls="publicImages">🌍 Images publiques</div>
+  <div id="btnPrivate" class="toggle-button" role="tab" tabindex="-1" aria-selected="false" aria-controls="privateImages">📸 Images privées</div>
+</div>
+
+<div id="publicImages" class="image-grid" role="tabpanel" aria-labelledby="btnPublic">
+  {% for img in public_images %}
+    <div class="image-card" tabindex="0">
+      <div class="image-card-header">
+        <img src="{{ img.image.url }}" alt="Image publique">
+        <button class="menu-button" aria-haspopup="true" aria-expanded="false" aria-label="Options">⋮</button>
+      </div>
+      <p>{{ img.description }}</p>
+
+      <div class="menu-dropdown" role="menu">
+        {% if img.user == request.user %}
+          <a href="{% url 'edit_image' img.id %}" role="menuitem">Modifier</a>
+          <form action="{% url 'delete_image' img.id %}" method="post" onsubmit="return confirm('Voulez-vous vraiment supprimer cette image ?');" role="none">
+            {% csrf_token %}
+            <button type="submit" role="menuitem">Supprimer</button>
+          </form>
+        {% endif %}
+        <a href="{{ img.image.url }}" download role="menuitem">Télécharger</a>
+      </div>
+    </div>
+  {% empty %}
+    <p>Aucune image publique disponible.</p>
+  {% endfor %}
+</div>
+
+<div id="privateImages" class="image-grid" role="tabpanel" aria-labelledby="btnPrivate" hidden>
+  {% for img in private_images %}
+    <div class="image-card" tabindex="0">
+      <div class="image-card-header">
+        <img src="{{ img.image.url }}" alt="Image privée">
+        <button class="menu-button" aria-haspopup="true" aria-expanded="false" aria-label="Options">⋮</button>
+      </div>
+      <p>{{ img.description }}</p>
+
+      <div class="menu-dropdown" role="menu">
+        <a href="{{ img.image.url }}" download role="menuitem">Télécharger</a>
+        <form action="{% url 'delete_private_image' img.id %}" method="post" onsubmit="return confirm('Voulez-vous vraiment supprimer cette image privée ?');" role="none">
+          {% csrf_token %}
+          <button type="submit" role="menuitem">Supprimer</button>
+        </form>
+      </div>
+    </div>
+  {% empty %}
+    <p>Aucune image privée disponible.</p>
+  {% endfor %}
+</div>
+
+<script>
+  // Toggle entre public/privé
+  const btnPublic = document.getElementById('btnPublic');
+  const btnPrivate = document.getElementById('btnPrivate');
+  const publicImages = document.getElementById('publicImages');
+  const privateImages = document.getElementById('privateImages');
+
+  function switchGallery(showPublic) {
+    if(showPublic){
+      btnPublic.classList.add('active');
+      btnPrivate.classList.remove('active');
+      btnPublic.setAttribute('aria-selected', 'true');
+      btnPublic.setAttribute('tabindex', '0');
+      btnPrivate.setAttribute('aria-selected', 'false');
+      btnPrivate.setAttribute('tabindex', '-1');
+      publicImages.hidden = false;
+      privateImages.hidden = true;
+    } else {
+      btnPrivate.classList.add('active');
+      btnPublic.classList.remove('active');
+      btnPrivate.setAttribute('aria-selected', 'true');
+      btnPrivate.setAttribute('tabindex', '0');
+      btnPublic.setAttribute('aria-selected', 'false');
+      btnPublic.setAttribute('tabindex', '-1');
+      privateImages.hidden = false;
+      publicImages.hidden = true;
+    }
+  }
+
+  btnPublic.addEventListener('click', () => switchGallery(true));
+  btnPrivate.addEventListener('click', () => switchGallery(false));
+
+  btnPublic.addEventListener('keydown', e => {
+    if(e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      switchGallery(true);
+      btnPublic.focus();
+    }
+  });
+  btnPrivate.addEventListener('keydown', e => {
+    if(e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      switchGallery(false);
+      btnPrivate.focus();
+    }
+  });
+
+  // Gestion menu déroulant
+  document.querySelectorAll('.menu-button').forEach(button => {
+    button.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const dropdown = button.nextElementSibling;
+      const expanded = button.getAttribute('aria-expanded') === 'true';
+      // Fermer tous les autres menus
+      document.querySelectorAll('.menu-dropdown.show').forEach(menu => {
+        if(menu !== dropdown){
+          menu.classList.remove('show');
+          menu.previousElementSibling.setAttribute('aria-expanded', 'false');
+        }
+      });
+      if(!expanded){
+        dropdown.classList.add('show');
+        button.setAttribute('aria-expanded', 'true');
+      } else {
+        dropdown.classList.remove('show');
+        button.setAttribute('aria-expanded', 'false');
+      }
+    });
+  });
+
+  // Fermer menus si clic ailleurs
+  window.addEventListener('click', () => {
+    document.querySelectorAll('.menu-dropdown.show').forEach(menu => {
+      menu.classList.remove('show');
+      menu.previousElementSibling.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  // Fermeture avec touche ESC
+  window.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape'){
+      document.querySelectorAll('.menu-dropdown.show').forEach(menu => {
+        menu.classList.remove('show');
+        menu.previousElementSibling.setAttribute('aria-expanded', 'false');
+      });
+    }
+  });
+</script>
+
+{% endblock %}

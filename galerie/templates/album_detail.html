@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Album : {{ album.nom }}{% endblock %}
+
+{% block content %}
+<h1>Album : {{ album.nom }}</h1>
+<a href="{% url 'albums' %}">← Retour aux albums</a>
+
+<div class="image-grid" style="display:grid; grid-template-columns: repeat(auto-fill,minmax(150px,1fr)); gap:1rem; margin-top:1rem;">
+  {% for img in album.image_set.all %}
+    <div class="image-card" style="border:1px solid #ccc; padding:5px; border-radius:8px;">
+      <img src="{{ img.image.url }}" alt="{{ img.description }}" style="width:100%; border-radius:8px;">
+      {% if img.description %}
+      <p>{{ img.description }}</p>
+      {% endif %}
+    </div>
+  {% empty %}
+    <p>Aucune image dans cet album.</p>
+  {% endfor %}
+</div>
+
+{% endblock %}

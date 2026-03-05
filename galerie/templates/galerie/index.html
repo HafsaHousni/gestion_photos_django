@@ -1,0 +1,99 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Page d'accueil</title>
+  <style>
+    /* Assure que la page prend toute la hauteur */
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+      color: white;
+      overflow: hidden; /* pour éviter scroll à cause de la vidéo */
+    }
+
+    /* Vidéo en fond qui couvre tout l'écran */
+    #background-video {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      min-width: 100%;
+      min-height: 100%;
+      width: auto;
+      height: auto;
+      z-index: -2; /* derrière tout */
+      object-fit: cover; /* pour bien couvrir toute la zone */
+    }
+
+    /* Calque noir transparent au-dessus de la vidéo */
+    #overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5); /* noir à 50% d'opacité */
+      z-index: -1; /* devant la vidéo mais derrière le contenu */
+    }
+
+    /* Contenu centré au milieu */
+    #content {
+      position: relative;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      z-index: 1; /* devant overlay et vidéo */
+      padding: 20px;
+    }
+
+    /* Styles pour le titre */
+    #content h1 {
+      font-size: 3rem;
+      margin-bottom: 40px;
+      text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+    }
+
+    /* Styles boutons */
+    .btn {
+      background-color: rgba(255, 255, 255, 0.2);
+      border: 2px solid white;
+      color: white;
+      padding: 15px 40px;
+      margin: 10px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      border-radius: 30px;
+      transition: background-color 0.3s, color 0.3s;
+      text-decoration: none;
+      display: inline-block;
+      min-width: 150px;
+    }
+
+    .btn:hover {
+      background-color: white;
+      color: black;
+    }
+  </style>
+</head>
+<body>
+  <video autoplay muted loop id="background-video">
+    <source src="{% static 'galerie/videos/background.mp4' %}" type="video/mp4" />
+    Votre navigateur ne supporte pas la vidéo HTML5.
+  </video>
+
+  <div id="overlay"></div>
+
+  <div id="content">
+    <h1>Bienvenue sur ta galerie photo</h1>
+    <a href="{% url 'login' %}" class="btn">Se connecter</a>
+    <a href="{% url 'register' %}" class="btn">S'inscrire</a>
+  </div>
+</body>
+</html>
